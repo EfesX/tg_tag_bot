@@ -51,7 +51,3 @@ func TestYDataBase(t *testing.T) {
 	}
 
 }
-
-//export YDB_ENDPOINT=grpcs://ydb.serverless.yandexcloud.net:2135
-//export YDB_CONNECTION_STRING=grpcs://ydb.serverless.yandexcloud.net:2135/ru-central1/b1g7t9amkto3it85f06v/etnl9onhehmsj3fgjkss
-//export YDB_ACCESS_TOKEN_CREDENTIALS=t1.9euelZqRlZPNm8yQipHIxp2SyJiXx-3rnpWakouVz8mKjpyKls6OkMiYjo7l8_dcbnBo-e9RNQEr_d3z9xwdbmj571E1ASv9.uZvHWcraQ-XUSG9szzDy7X-vptKr4j2TjBenTmrZP8aXYHTipMVobED9tg8fbe_2iAbyaBlNWxLEpYwIok6PCw
