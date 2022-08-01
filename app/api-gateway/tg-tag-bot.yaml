@@ -1,0 +1,12 @@
+openapi: 3.0.0
+info:
+  title: api-for-tg-tag-bot
+  version: 1.0.0
+paths:
+  /:
+    post:
+      x-yc-apigateway-integration:
+        type: cloud-functions
+        function_id: d4e2tthimqrkfch5abhn
+      operationId: tg-tag-bot
+      
