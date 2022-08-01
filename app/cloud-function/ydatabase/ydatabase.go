@@ -26,12 +26,12 @@ type YandexDatabase struct {
 }
 
 type YDBTableMessage struct {
-	msg_id uint32
-	board  [16]uint8
-	time   time.Time
+	Msg_id uint32
+	Board  [16]uint8
+	Time   time.Time
 }
 
-func NewYandexDatabase(endpoint string) YandexDatabase {
+func Connect(endpoint string) YandexDatabase {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	db, err := ydb.Open(
@@ -55,12 +55,12 @@ func NewYandexDatabase(endpoint string) YandexDatabase {
 	}
 }
 
-func (yd *YandexDatabase) create_database(name string) error {
+func (yd *YandexDatabase) CreateDatabase(name string) error {
 	return yd.tableclient.Do(
 		yd.ctx,
 		func(ctx context.Context, s table.Session) error {
 			return s.CreateTable(ctx, path.Join(yd.prefix, name),
-				options.WithColumn("msg_id", types.Optional(types.TypeUint32)),
+				options.WithColumn("Msg_id", types.Optional(types.TypeUint32)),
 				options.WithColumn("P1", types.Optional(types.TypeUint8)),
 				options.WithColumn("P2", types.Optional(types.TypeUint8)),
 				options.WithColumn("P3", types.Optional(types.TypeUint8)),
@@ -77,14 +77,14 @@ func (yd *YandexDatabase) create_database(name string) error {
 				options.WithColumn("P14", types.Optional(types.TypeUint8)),
 				options.WithColumn("P15", types.Optional(types.TypeUint8)),
 				options.WithColumn("P16", types.Optional(types.TypeUint8)),
-				options.WithColumn("time", types.Optional(types.TypeDatetime)),
-				options.WithPrimaryKeyColumn("msg_id"),
+				options.WithColumn("Time", types.Optional(types.TypeDatetime)),
+				options.WithPrimaryKeyColumn("Msg_id"),
 			)
 		},
 	)
 }
 
-func (yd *YandexDatabase) write_to_database(name string, data [1]YDBTableMessage) error {
+func (yd *YandexDatabase) WriteToDatabase(name string, data [1]YDBTableMessage) error {
 	var wrap = func(err error, explanation string) error {
 		if err != nil {
 			return fmt.Errorf("%s: %w", explanation, err)
@@ -100,24 +100,24 @@ func (yd *YandexDatabase) write_to_database(name string, data [1]YDBTableMessage
 			for _, msg := range data {
 
 				rows = append(rows, types.StructValue(
-					types.StructFieldValue("msg_id", types.Uint32Value(uint32(msg.msg_id))),
-					types.StructFieldValue("P1", types.Uint8Value(uint8(msg.board[0]))),
-					types.StructFieldValue("P2", types.Uint8Value(uint8(msg.board[1]))),
-					types.StructFieldValue("P3", types.Uint8Value(uint8(msg.board[2]))),
-					types.StructFieldValue("P4", types.Uint8Value(uint8(msg.board[3]))),
-					types.StructFieldValue("P5", types.Uint8Value(uint8(msg.board[4]))),
-					types.StructFieldValue("P6", types.Uint8Value(uint8(msg.board[5]))),
-					types.StructFieldValue("P7", types.Uint8Value(uint8(msg.board[6]))),
-					types.StructFieldValue("P8", types.Uint8Value(uint8(msg.board[7]))),
-					types.StructFieldValue("P9", types.Uint8Value(uint8(msg.board[8]))),
-					types.StructFieldValue("P10", types.Uint8Value(uint8(msg.board[9]))),
-					types.StructFieldValue("P11", types.Uint8Value(uint8(msg.board[10]))),
-					types.StructFieldValue("P12", types.Uint8Value(uint8(msg.board[11]))),
-					types.StructFieldValue("P13", types.Uint8Value(uint8(msg.board[12]))),
-					types.StructFieldValue("P14", types.Uint8Value(uint8(msg.board[13]))),
-					types.StructFieldValue("P15", types.Uint8Value(uint8(msg.board[14]))),
-					types.StructFieldValue("P16", types.Uint8Value(uint8(msg.board[15]))),
-					types.StructFieldValue("time", types.DatetimeValueFromTime(msg.time)),
+					types.StructFieldValue("Msg_id", types.Uint32Value(uint32(msg.Msg_id))),
+					types.StructFieldValue("P1", types.Uint8Value(uint8(msg.Board[0]))),
+					types.StructFieldValue("P2", types.Uint8Value(uint8(msg.Board[1]))),
+					types.StructFieldValue("P3", types.Uint8Value(uint8(msg.Board[2]))),
+					types.StructFieldValue("P4", types.Uint8Value(uint8(msg.Board[3]))),
+					types.StructFieldValue("P5", types.Uint8Value(uint8(msg.Board[4]))),
+					types.StructFieldValue("P6", types.Uint8Value(uint8(msg.Board[5]))),
+					types.StructFieldValue("P7", types.Uint8Value(uint8(msg.Board[6]))),
+					types.StructFieldValue("P8", types.Uint8Value(uint8(msg.Board[7]))),
+					types.StructFieldValue("P9", types.Uint8Value(uint8(msg.Board[8]))),
+					types.StructFieldValue("P10", types.Uint8Value(uint8(msg.Board[9]))),
+					types.StructFieldValue("P11", types.Uint8Value(uint8(msg.Board[10]))),
+					types.StructFieldValue("P12", types.Uint8Value(uint8(msg.Board[11]))),
+					types.StructFieldValue("P13", types.Uint8Value(uint8(msg.Board[12]))),
+					types.StructFieldValue("P14", types.Uint8Value(uint8(msg.Board[13]))),
+					types.StructFieldValue("P15", types.Uint8Value(uint8(msg.Board[14]))),
+					types.StructFieldValue("P16", types.Uint8Value(uint8(msg.Board[15]))),
+					types.StructFieldValue("Time", types.DatetimeValueFromTime(msg.Time)),
 				))
 			}
 
@@ -127,7 +127,7 @@ func (yd *YandexDatabase) write_to_database(name string, data [1]YDBTableMessage
 	return wrap(err, "failed to write log batch")
 }
 
-func (yd *YandexDatabase) read_from_table(name string, msg_id uint32, data *YDBTableMessage) (err error) {
+func (yd *YandexDatabase) ReadFromTable(name string, msg_id uint32, data *YDBTableMessage) (err error) {
 	type templateConfig struct {
 		TablePathPrefix string
 	}
@@ -144,8 +144,8 @@ func (yd *YandexDatabase) read_from_table(name string, msg_id uint32, data *YDBT
 			"PRAGMA TablePathPrefix('{{ .TablePathPrefix}}');\n"+
 				"DECLARE $msg_id AS Uint32; "+
 				"SELECT * "+
-				"FROM `HALLO_BASE`\n"+
-				"WHERE msg_id == $msg_id",
+				"FROM `"+name+"`\n"+
+				"WHERE Msg_id == $msg_id",
 		)),
 		templateConfig{
 			TablePathPrefix: yd.prefix,
@@ -182,29 +182,31 @@ func (yd *YandexDatabase) read_from_table(name string, msg_id uint32, data *YDBT
 	for res.NextResultSet(yd.ctx) {
 		for res.NextRow() {
 			err = res.ScanNamed(
-				named.Required("msg_id", &data.msg_id),
-				named.Required("P1", &data.board[0]),
-				named.Required("P2", &data.board[1]),
-				named.Required("P3", &data.board[2]),
-				named.Required("P4", &data.board[3]),
-				named.Required("P5", &data.board[4]),
-				named.Required("P6", &data.board[5]),
-				named.Required("P7", &data.board[6]),
-				named.Required("P8", &data.board[7]),
-				named.Required("P9", &data.board[8]),
-				named.Required("P10", &data.board[9]),
-				named.Required("P11", &data.board[10]),
-				named.Required("P12", &data.board[11]),
-				named.Required("P13", &data.board[12]),
-				named.Required("P14", &data.board[13]),
-				named.Required("P15", &data.board[14]),
-				named.Required("P16", &data.board[15]),
+				named.Required("Msg_id", &data.Msg_id),
+				named.Required("P1", &data.Board[0]),
+				named.Required("P2", &data.Board[1]),
+				named.Required("P3", &data.Board[2]),
+				named.Required("P4", &data.Board[3]),
+				named.Required("P5", &data.Board[4]),
+				named.Required("P6", &data.Board[5]),
+				named.Required("P7", &data.Board[6]),
+				named.Required("P8", &data.Board[7]),
+				named.Required("P9", &data.Board[8]),
+				named.Required("P10", &data.Board[9]),
+				named.Required("P11", &data.Board[10]),
+				named.Required("P12", &data.Board[11]),
+				named.Required("P13", &data.Board[12]),
+				named.Required("P14", &data.Board[13]),
+				named.Required("P15", &data.Board[14]),
+				named.Required("P16", &data.Board[15]),
 			)
+
 			if err != nil {
 				panic(err)
 			}
 
 		}
 	}
+
 	return res.Err()
 }

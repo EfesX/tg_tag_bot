@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	tg "github.com/go-telegram-bot-api/telegram-bot-api"
+	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type GameMarkUp interface {
@@ -14,7 +14,7 @@ type MarkUpGameBoard struct {
 	btns   [16]tg.InlineKeyboardButton
 }
 
-func (m *MarkUpGameBoard) CreateBoard(b []int) *tg.InlineKeyboardMarkup {
+func (m *MarkUpGameBoard) CreateBoard(b [16]uint8) *tg.InlineKeyboardMarkup {
 	for i, v := range b {
 		if v == 0 {
 			m.btns[i] = tg.NewInlineKeyboardButtonData(" ", "0")
